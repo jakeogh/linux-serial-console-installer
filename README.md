@@ -27,9 +27,10 @@ If it completed sucessfully, the last line should read:
 #### After rebooting `server`:
 
 1. Plug the USB serial device into `server`.
-2. Connect `server` USB device from step 1 to an approprate device connected to a `client` computer.
-3. Install `screen` on the `client` computer: `sudo apt install screen -y`
-4. On the `client` computer execute: `screen -h 10000 -t 'ttyUSB0 9600 8n1' /dev/ttyUSB0 9600,-ixoff,-ixon` to connect to the serial console on the server. You may need to press ENTER.
+2. On the `server` execute `sudo systemctl start serial-getty@ttyUSB_0403_6001_console.service` (this is a bug, it should happen automatically)
+3. Connect `server` USB device from step 1 to an approprate device connected to a `client` computer.
+4. Install `screen` on the `client` computer: `sudo apt install screen -y`
+5. On the `client` computer execute: `screen -h 10000 -t 'ttyUSB0 9600 8n1' /dev/ttyUSB0 9600,-ixoff,-ixon` to connect to the serial console on the server. You may need to press ENTER.
 
 
 ### Troubleshooting:
