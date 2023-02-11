@@ -1,1 +1,3 @@
 include linux_serial_console_installer/_linux_serial_console_installer_debian_11.sh
+include linux_serial_console_installer/_start_agetty.sh
+include linux_serial_console_installer/_start_agetty_fork.sh
