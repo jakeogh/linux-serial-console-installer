@@ -30,7 +30,6 @@ def debian_11() -> None:
     with resources.path(
         "linux_serial_console_installer", "_linux_serial_console_installer_debian_11.sh"
     ) as _installer_path:
-        # _commands = [".", _installer_path.as_posix()]
         _commands = ["/bin/bash", _installer_path.as_posix()]
         _command = " ".join(_commands)
         print(_command)

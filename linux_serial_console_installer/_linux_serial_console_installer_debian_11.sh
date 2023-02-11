@@ -4,30 +4,8 @@ cat /etc/issue
 grep "Debian GNU/Linux 11" /etc/issue > /dev/null || { echo "This script requires Debian 11" ; exit 1 ; }
 #set -x
 
-module_path=$(python3 << EOF
-from importlib import resources
-with resources.path('linux_serial_console_installer', '_linux_serial_console_installer_debian_11.sh') as rp:
-        print(rp.parent.as_posix())
-EOF
-)
-
-#echo "${module_path}"
-
-#linux_gpib_repo="${module_path}/linux-gpib"
-#test -d "${linux_gpib_repo}" || { echo "${linux_gpib_repo} is not a directory. Exiting." ; exit 1 ; }
-
 PATH="/home/${USER}/.local/bin:${PATH}"
 export PATH=${PATH}
-
-#work="/home/${USER}/tmp"
-#mkdir "/home/${USER}/tmp" > /dev/null 2>&1
-#test -d "${linux_gpib_repo}" || { echo "${work} is not a directory. Exiting." ; exit 1 ; }
-
-#echo "work: ${work}"
-#cd "${work}" || exit 1
-
-#sudo apt-get install devscripts dkms subversion git -y || exit 1
-#cd "${work}" || exit 1
 
 test -f /etc/udev/rules.d/99-com.rules.original || { sudo cp /etc/udev/rules.d/99-com.rules /etc/udev/rules.d/99-com.rules.original || exit 1 ; }
 
