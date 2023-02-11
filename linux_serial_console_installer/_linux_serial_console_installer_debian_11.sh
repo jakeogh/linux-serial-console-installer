@@ -14,10 +14,7 @@ with resources.path('linux_serial_console_installer', '_linux_serial_console_ins
 EOF
 )
 
-echo "${module_path}"
-
-#linux_gpib_repo="${module_path}/linux-gpib"
-#test -d "${linux_gpib_repo}" || { echo "${linux_gpib_repo} is not a directory. Exiting." ; exit 1 ; }
+#echo "${module_path}"
 
 sudo apt install at -y --no-install-recommends
 
@@ -26,8 +23,9 @@ test -f /etc/udev/rules.d/99-com.rules.original || { sudo cp /etc/udev/rules.d/9
 echo -n -e "\nPress ENTER when the USB device that you want an automatic linux console to be created on is connected: "
 read -s
 echo -n -e "\r"
-echo -n -e "                                                "
+echo -n -e "                                                                                                          "
 echo -n -e "\r"
+sleep 2
 cmd=$(lsusb)
 echo "${cmd}" | nl
 echo -n -e "\nEnter line # you want to create a persistent login console on: "
@@ -44,20 +42,36 @@ product=$(echo "${usb_id}" | cut -d ':' -f 2)
 
 device="ttyUSB_${vendor}_${product}_console"
 udev_rule="KERNEL==\"ttyUSB[0-9]*\", ATTRS{idVendor}==\"${vendor}\", ATTRS{idProduct}==\"${product}\", SYMLINK+=\"${device}\""
+echo -e "\n"
 echo ${udev_rule}
 udev_rule_run="KERNEL==\"ttyUSB[0-9]*\", ATTRS{idVendor}==\"${vendor}\", ATTRS{idProduct}==\"${product}\", RUN+=\"${module_path}/_start_agetty_fork.sh ${module_path}/_start_agetty.sh ${device}\""
 echo ${udev_rule_run}
 
-echo -n "Press Enter to write the above udev rule: "
+echo -e -n "\nPress Enter to write the above udev rule: "
 read
 
 grep "${udev_rule}" /etc/udev/rules.d/99-com.rules && { echo "ERROR: rule already exists in /etc/udev/rules.d/99-com.rules. Exiting." ; exit 1 ; }
-cat << EOF | sudo tee -a /etc/udev/rules.d/99-com.rules
+cat << EOF | sudo tee -a /etc/udev/rules.d/99-com.rules > /dev/null
 ${udev_rule}
 ${udev_rule_run}
 EOF
 
-# by default, systemd causes the gui to not load if a service fails to start. It's not great.
-#sudo systemctl enable "serial-getty@ttyUSB_${device}_console.service"
+sudo udevadm control --reload-rules && sudo udevadm trigger
 
-echo "Debian 11 linux-serial-console-installer install completed OK, A REBOOT IS REQUIRED."
+echo -e "\nWaiting for /dev/${device} to be created..."
+while [ ! -h "/dev/${device}" ]
+do
+  #ls -alh "/dev/${device}"
+  sleep 0.1
+done
+ls -alh "/dev/${device}"
+
+echo -e "\nWaiting for agetty to start..."
+until ps -auxw | grep agetty | grep "${device}" | grep vt220
+do
+  #ps -auxw | grep agetty | grep "${device}" | grep vt220
+  sleep 0.1
+done
+
+echo -e "\nDebian 11 linux-serial-console-installer install completed OK!\n"
+
