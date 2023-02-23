@@ -1,7 +1,7 @@
 #!/bin/bash
 
 cat /etc/issue
-grep "Debian GNU/Linux 11" /etc/issue > /dev/null || { echo "This script requires Debian 11" ; exit 1 ; }
+grep -E "(Debian GNU/Linux 11|Raspbian GNU/Linux 11)" /etc/issue > /dev/null || { echo "This script requires Debian 11 or Raspbian 11" ; exit 1 ; }
 #set -x
 
 PATH="/home/${USER}/.local/bin:${PATH}"
@@ -28,9 +28,15 @@ echo -n -e "\r"
 sleep 2
 cmd=$(lsusb)
 echo "${cmd}" | nl
-echo -n -e "\nEnter line # you want to create a persistent login console on: "
+echo -n -e "\nEnter line # you want to create a persistent login console on (CTRL-c to cancel): "
 read line_num
 #echo "${line_num}"
+
+if [[ -n ${line_num//[0-9]/} ]]; then
+    echo "Error: Input contains letters! Exiting."
+    exit 1
+fi
+
 line=$(echo "${cmd}" | head -n $(("${line_num}")) | tail -n 1)
 #echo "${line}"
 usb_id=$(echo "${line}" | cut -d ' ' -f 6)

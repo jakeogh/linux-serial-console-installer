@@ -32,7 +32,7 @@ If it completed sucessfully, the last line should read:
 
 ### Troubleshooting:
 
-1. On the `server` verify getty is listening on the expected serial device:
+1. On the `server` verify agetty is listening on the expected serial device:
 
 ```
 $ ps -auxw | grep getty
